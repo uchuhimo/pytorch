@@ -391,6 +391,10 @@ void initPythonIRBindings(PyObject* module_) {
           "insertConstant",
           [](Graph& g, IValue ival) { return g.insertConstant(ival); })
       .GS(lint)
+      .def_property(
+          "after_optimize_callback",
+          &Graph::after_optimize_callback,
+          &Graph::set_after_optimize_callback)
       .GS(insertNode);
 #undef GS
 

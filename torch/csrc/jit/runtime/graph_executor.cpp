@@ -549,10 +549,16 @@ struct GraphExecutorImpl : public GraphExecutorImplBase {
         logging::runtime_counters::GRAPH_EXECUTORS_CONSTRUCTED, 1.0);
   }
 
-  ExecutionPlan getPlanFor(Stack& stack, size_t remaining_bailout_depth)
-      override {
+  ExecutionPlan getPlanForInner(Stack& stack, size_t remaining_bailout_depth) {
     return getGraphExecutorOptimize() ? getOrCompile(stack)
                                       : getOrCompileFallback();
+  }
+
+  ExecutionPlan getPlanFor(Stack& stack, size_t remaining_bailout_depth)
+      override {
+    auto plan = getPlanForInner(stack, remaining_bailout_depth);
+    auto new_graph = graph->after_optimize_callback()(plan.graph);
+    return ExecutionPlan(new_graph, function_name_, remaining_bailout_depth);
   }
 
   GraphExecutorState getDebugState() override {

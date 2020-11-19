@@ -446,7 +446,7 @@ ProfilingGraphExecutorImpl::ProfilingGraphExecutorImpl(
     std::string function_name)
     : GraphExecutorImplBase(graph, std::move(function_name)) {}
 
-ExecutionPlan ProfilingGraphExecutorImpl::getPlanFor(
+ExecutionPlan ProfilingGraphExecutorImpl::getPlanForInner(
     Stack& stack,
     size_t remaining_bailout_depth) {
   std::lock_guard<std::mutex> lock(compile_mutex);
@@ -515,6 +515,14 @@ ExecutionPlan ProfilingGraphExecutorImpl::getPlanFor(
   optimized_plan_ =
       ExecutionPlan(copy, function_name_, *remaining_bailout_depth_);
   return *optimized_plan_;
+}
+
+ExecutionPlan ProfilingGraphExecutorImpl::getPlanFor(
+    Stack& stack,
+    size_t remaining_bailout_depth) {
+  auto plan = getPlanForInner(stack, remaining_bailout_depth);
+  auto new_graph = graph->after_optimize_callback()(plan.graph);
+  return ExecutionPlan(new_graph, function_name_, remaining_bailout_depth);
 }
 
 GraphExecutorState ProfilingGraphExecutorImpl::getDebugState() {

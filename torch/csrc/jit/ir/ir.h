@@ -1004,6 +1004,9 @@ struct Block {
       owning_node_; // either the node that has this block or nullptr for root
 };
 
+using GraphPtr = std::shared_ptr<Graph>;
+using GraphCallback = std::function<GraphPtr(GraphPtr)>;
+
 struct Graph {
   TH_DISALLOW_COPY_AND_ASSIGN(Graph);
   friend struct Node;
@@ -1029,14 +1032,24 @@ struct Graph {
   // by default this is set to append to the top level block
   Node* insert_before_;
 
+  GraphCallback after_optimize_callback_;
+
  public:
   Graph(ScopePtr scope_root)
       : next_unique_(0),
         current_scope_(std::move(scope_root)),
         block_(new Block(this, nullptr)),
-        insert_before_(return_node()) {}
+        insert_before_(return_node()),
+        after_optimize_callback_([](auto graph) { return graph; }) {}
 
   Graph() : Graph(c10::make_intrusive<Scope>()) {}
+
+  GraphCallback after_optimize_callback() {
+    return after_optimize_callback_;
+  }
+  void set_after_optimize_callback(GraphCallback after_optimize_callback) {
+    after_optimize_callback_ = after_optimize_callback;
+  }
 
   at::ArrayRef<Value*> inputs() {
     return block_->inputs();

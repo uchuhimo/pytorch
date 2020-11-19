@@ -15,6 +15,7 @@ struct ProfilingGraphExecutorImpl : public GraphExecutorImplBase {
   ~ProfilingGraphExecutorImpl() override = default;
 
  private:
+  ExecutionPlan getPlanForInner(Stack& stack, size_t remaining_bailout_depth);
   void runProfilingInsensitiveOptimizations(std::shared_ptr<Graph>& graph);
   void runProfilingOptimizations(std::shared_ptr<Graph>& graph);
   void replaceFallbackGraphWithFallbackFunction(Block* b);

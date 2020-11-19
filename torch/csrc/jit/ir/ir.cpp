@@ -687,6 +687,7 @@ std::shared_ptr<Graph> Graph::copy() {
         " not in scope. Run lint!");
   };
   new_g->block()->cloneFrom(this->block(), env);
+  new_g->set_after_optimize_callback(this->after_optimize_callback());
   return new_g;
 }
 

@@ -525,6 +525,18 @@ void initJITBindings(PyObject* module) {
             return old_depth;
           })
       .def(
+          "_jit_get_profiling_mode",
+          []() { return getProfilingMode().load(); })
+      .def(
+          "_jit_get_profiling_executor",
+          []() { return getExecutorMode().load(); })
+      .def(
+          "_jit_get_num_profiled_runs",
+          []() { return getNumProfiledRuns().load(); })
+      .def(
+          "_jit_get_bailout_depth",
+          []() { return getBailoutDepth().load(); })
+      .def(
           "_jit_set_inline_everything_mode",
           [](bool enabled) { getInlineEverythingMode() = enabled; })
       .def(
